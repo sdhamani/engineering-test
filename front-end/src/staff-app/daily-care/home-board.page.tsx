@@ -12,6 +12,7 @@ import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
+  const [sortBy, setSortBy] = useState({ type: "", using: "" })
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
 
   useEffect(() => {
@@ -21,6 +22,20 @@ export const HomeBoardPage: React.FC = () => {
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
       setIsRollMode(true)
+    } else if (action === "sort") {
+      if (sortBy?.type === "firstName") {
+        data?.students.sort(function (a, b) {
+          if (a.first_name > b.first_name) {
+            return -1
+          } else return 1
+        })
+      } else {
+        data?.students?.sort(function (a, b) {
+          if (b.first_name > a.first_name) {
+            return -1
+          } else return 1
+        })
+      }
     }
   }
 
@@ -33,7 +48,7 @@ export const HomeBoardPage: React.FC = () => {
   return (
     <>
       <S.PageContainer>
-        <Toolbar onItemClick={onToolbarAction} />
+        <Toolbar onItemClick={onToolbarAction} sortBy={sortBy} setSortBy={setSortBy} />
 
         {loadState === "loading" && (
           <CenteredContainer>
@@ -63,9 +78,11 @@ export const HomeBoardPage: React.FC = () => {
 type ToolbarAction = "roll" | "sort"
 interface ToolbarProps {
   onItemClick: (action: ToolbarAction, value?: string) => void
+  sortBy: any
+  setSortBy: any
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
-  const { onItemClick } = props
+  const { onItemClick, sortBy, setSortBy } = props
   const sortSelect = {
     color: `${Colors.neutral.base}`,
     backgroundColor: `${Colors.blue.base}`,
@@ -75,8 +92,8 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
     <S.ToolbarContainer>
       <div onClick={() => onItemClick("sort")}>
         <label htmlFor="names">Sort By: </label>
-        <select style={sortSelect} id="names" name="names">
-          <option value="" selected hidden>
+        <select style={sortSelect} id="names" name="names" value={sortBy} onChange={(event) => setSortBy((sortObj: any) => ({ ...sortObj, type: event.target.value }))}>
+          <option value="" defaultValue="true" hidden>
             None
           </option>
           <option value="firstName">First Name</option>
