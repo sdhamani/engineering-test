@@ -66,9 +66,23 @@ interface ToolbarProps {
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
   const { onItemClick } = props
+  const sortSelect = {
+    color: `${Colors.neutral.base}`,
+    backgroundColor: `${Colors.blue.base}`,
+  }
+
   return (
     <S.ToolbarContainer>
-      <div onClick={() => onItemClick("sort")}>First Name</div>
+      <div onClick={() => onItemClick("sort")}>
+        <label htmlFor="names">Sort By: </label>
+        <select style={sortSelect} id="names" name="names">
+          <option value="" selected hidden>
+            None
+          </option>
+          <option value="firstName">First Name</option>
+          <option value="lastName">Last Name</option>
+        </select>
+      </div>
       <div>Search</div>
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
