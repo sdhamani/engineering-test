@@ -15,7 +15,8 @@ export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [sortBy, setSortBy] = useState({ type: "", using: "asc" })
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
-  const [sortedArray, setSortedArray] = useState()
+  const [sortedArray, setSortedArray] = useState(data?.students)
+
   useEffect(() => {
     void getStudents()
   }, [getStudents])
@@ -34,36 +35,42 @@ export const HomeBoardPage: React.FC = () => {
     } else if (action === "sort") {
       if (sortBy?.type === "firstName") {
         if (sortBy.using === "asc") {
-          let sortedArrasc = [...data.students]?.sort(function (a, b) {
-            if (a.first_name > b.first_name) {
-              return 1
-            } else return -1
-          })
+          let sortedArrasc =
+            data &&
+            [...data.students]?.sort(function (a, b) {
+              if (a.first_name > b.first_name) {
+                return 1
+              } else return -1
+            })
           setSortedArray(sortedArrasc)
         } else {
-          let sortedArrdesc = [...data.students]?.sort(function (a, b) {
-            if (a.first_name > b.first_name) {
-              return -1
-            } else return 1
-          })
+          let sortedArrdesc =
+            data &&
+            [...data.students]?.sort(function (a, b) {
+              if (a.first_name > b.first_name) {
+                return -1
+              } else return 1
+            })
           setSortedArray(sortedArrdesc)
         }
       } else if (sortBy?.type === "lastName") {
         if (sortBy.using === "asc") {
           setSortedArray(
-            [...data.students]?.sort(function (a, b) {
-              if (b.last_name > a.last_name) {
-                return 1
-              } else return -1
-            })
+            data &&
+              [...data.students]?.sort(function (a, b) {
+                if (b.last_name > a.last_name) {
+                  return -1
+                } else return 1
+              })
           )
         } else {
           setSortedArray(
-            [...data?.students]?.sort(function (a, b) {
-              if (b.last_name > a.last_name) {
-                return -1
-              } else return 1
-            })
+            data &&
+              [...data?.students]?.sort(function (a, b) {
+                if (b.last_name > a.last_name) {
+                  return 1
+                } else return -1
+              })
           )
         }
       }
@@ -89,8 +96,8 @@ export const HomeBoardPage: React.FC = () => {
 
         {loadState === "loaded" && sortedArray && (
           <>
-            {sortedArray.map((s) => (
-              <StudentListTile key={s.id} isRollMode={isRollMode} student={s} />
+            {sortedArray.map((s, index) => (
+              <StudentListTile key={index} isRollMode={isRollMode} student={s} />
             ))}
           </>
         )}
@@ -136,9 +143,9 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
         </select>
 
         {sortBy.using === "asc" ? (
-          <FontAwesomeIcon style={sortByUsing} onClick={() => setSortBy((sortObj: any) => ({ ...sortObj, using: "desc" }))} icon={faSortAmountDownAlt} />
+          <FontAwesomeIcon style={sortByUsing} onClick={(event) => (setSortBy({ ...sortBy, using: "desc" }), event.stopPropagation())} icon={faSortAmountDownAlt} />
         ) : (
-          <FontAwesomeIcon style={sortByUsing} onClick={() => setSortBy((sortObj: any) => ({ ...sortObj, using: "asc" }))} icon={faSortAmountUpAlt} />
+          <FontAwesomeIcon style={sortByUsing} onClick={(event) => (setSortBy({ ...sortBy, using: "asc" }), event.stopPropagation())} icon={faSortAmountUpAlt} />
         )}
       </div>
       <div>Search</div>
