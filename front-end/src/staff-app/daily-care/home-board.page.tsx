@@ -15,14 +15,16 @@ export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [sortBy, setSortBy] = useState({ type: "", using: "asc" })
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
-  const [sortedArray, setSortedArray] = useState(data?.students)
+  const [transformedArray, setTransformedArray] = useState<any>(data?.students)
+
+  console.log({ transformedArray })
 
   useEffect(() => {
     void getStudents()
   }, [getStudents])
 
   useEffect(() => {
-    void setSortedArray(data?.students)
+    void setTransformedArray(data?.students)
   }, [data])
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export const HomeBoardPage: React.FC = () => {
                 return 1
               } else return -1
             })
-          setSortedArray(sortedArrasc)
+          setTransformedArray(sortedArrasc)
         } else {
           let sortedArrdesc =
             data &&
@@ -51,11 +53,11 @@ export const HomeBoardPage: React.FC = () => {
                 return -1
               } else return 1
             })
-          setSortedArray(sortedArrdesc)
+          setTransformedArray(sortedArrdesc)
         }
       } else if (sortBy?.type === "lastName") {
         if (sortBy.using === "asc") {
-          setSortedArray(
+          setTransformedArray(
             data &&
               [...data.students]?.sort(function (a, b) {
                 if (b.last_name > a.last_name) {
@@ -64,7 +66,7 @@ export const HomeBoardPage: React.FC = () => {
               })
           )
         } else {
-          setSortedArray(
+          setTransformedArray(
             data &&
               [...data?.students]?.sort(function (a, b) {
                 if (b.last_name > a.last_name) {
@@ -86,7 +88,7 @@ export const HomeBoardPage: React.FC = () => {
   return (
     <>
       <S.PageContainer>
-        <Toolbar onItemClick={onToolbarAction} sortBy={sortBy} setSortBy={setSortBy} />
+        <Toolbar onItemClick={onToolbarAction} sortBy={sortBy} setSortBy={setSortBy} data={data} setTransformedArray={setTransformedArray} />
 
         {loadState === "loading" && (
           <CenteredContainer>
@@ -94,10 +96,10 @@ export const HomeBoardPage: React.FC = () => {
           </CenteredContainer>
         )}
 
-        {loadState === "loaded" && sortedArray && (
+        {loadState === "loaded" && transformedArray && (
           <>
-            {sortedArray.map((s, index) => (
-              <StudentListTile key={index} isRollMode={isRollMode} student={s} />
+            {transformedArray.map((s: any) => (
+              <StudentListTile key={s.id} isRollMode={isRollMode} transformedArray={transformedArray} setTransformedArray={setTransformedArray} student={s} />
             ))}
           </>
         )}
@@ -108,7 +110,7 @@ export const HomeBoardPage: React.FC = () => {
           </CenteredContainer>
         )}
       </S.PageContainer>
-      <ActiveRollOverlay isActive={isRollMode} onItemClick={onActiveRollAction} />
+      <ActiveRollOverlay transformedArray={transformedArray} isActive={isRollMode} onItemClick={onActiveRollAction} />
     </>
   )
 }
@@ -118,9 +120,11 @@ interface ToolbarProps {
   onItemClick: (action: ToolbarAction, value?: string) => void
   sortBy: any
   setSortBy: any
+  setTransformedArray: any
+  data: any
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
-  const { onItemClick, sortBy, setSortBy } = props
+  const { onItemClick, sortBy, setSortBy, data, setTransformedArray } = props
   const sortSelect = {
     color: `${Colors.neutral.base}`,
     backgroundColor: `${Colors.blue.base}`,
@@ -128,6 +132,22 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
 
   const sortByUsing = {
     margin: `0 ${Spacing.u2}`,
+  }
+  const searchInput = {
+    padding: `${Spacing.u1} ${Spacing.u2}`,
+    outline: "none",
+  }
+
+  const searchUsers = (event: any) => {
+    const userInput = event.target.value
+    if (userInput !== "") {
+      const filteredUsers = [...data?.students].filter((user) => {
+        return user.first_name.toUpperCase().startsWith(userInput.toUpperCase())
+      })
+      setTransformedArray(filteredUsers)
+    } else {
+      setTransformedArray(data.students)
+    }
   }
 
   return (
@@ -148,7 +168,10 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
           <FontAwesomeIcon style={sortByUsing} onClick={(event) => (setSortBy({ ...sortBy, using: "asc" }), event.stopPropagation())} icon={faSortAmountUpAlt} />
         )}
       </div>
-      <div>Search</div>
+      <div>
+        {" "}
+        <input style={searchInput} onChange={(e) => searchUsers(e)} type="search" placeholder="Search user" />
+      </div>
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )
