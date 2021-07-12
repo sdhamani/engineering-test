@@ -1,4 +1,5 @@
 import { getRandomInt, generateRange } from "shared/helpers/math-utils"
+import { convertToObject } from "typescript"
 
 const nameTokens = ["Alan", "John", "Brandon", "Key", "Branda", "Morris", "Carlos", "Lee"]
 
@@ -7,6 +8,7 @@ export function generateStudent(id: number) {
     id,
     first_name: nameTokens[getRandomInt(0, nameTokens.length - 1)],
     last_name: nameTokens[getRandomInt(0, nameTokens.length - 1)],
+    status: "unmark",
   }
 }
 
