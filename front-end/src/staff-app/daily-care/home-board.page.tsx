@@ -20,6 +20,10 @@ export const HomeBoardPage: React.FC = () => {
     void getStudents()
   }, [getStudents])
 
+  useEffect(() => {
+    void setSortedArray(data?.students)
+  }, [data])
+
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
       setIsRollMode(true)
@@ -80,9 +84,9 @@ export const HomeBoardPage: React.FC = () => {
           </CenteredContainer>
         )}
 
-        {loadState === "loaded" && data?.students && (
+        {loadState === "loaded" && sortedArray && (
           <>
-            {data.students.map((s) => (
+            {sortedArray.map((s) => (
               <StudentListTile key={s.id} isRollMode={isRollMode} student={s} />
             ))}
           </>
