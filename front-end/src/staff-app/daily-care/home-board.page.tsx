@@ -24,45 +24,48 @@ export const HomeBoardPage: React.FC = () => {
     void setSortedArray(data?.students)
   }, [data])
 
+  useEffect(() => {
+    onToolbarAction("sort")
+  }, [sortBy])
+
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
       setIsRollMode(true)
     } else if (action === "sort") {
       if (sortBy?.type === "firstName") {
-        let sortedArray: any
         if (sortBy.using === "asc") {
-          sortedArray = data?.students.sort(function (a, b) {
+          let sortedArrasc = [...data.students]?.sort(function (a, b) {
             if (a.first_name > b.first_name) {
               return 1
             } else return -1
           })
+          setSortedArray(sortedArrasc)
         } else {
-          sortedArray = data?.students.sort(function (a, b) {
+          let sortedArrdesc = [...data.students]?.sort(function (a, b) {
             if (a.first_name > b.first_name) {
-              console.log(a.first_name, b.first_name)
               return -1
             } else return 1
           })
+          setSortedArray(sortedArrdesc)
         }
-
-        setSortedArray(sortedArray)
       } else if (sortBy?.type === "lastName") {
-        let sortedArray: any
         if (sortBy.using === "asc") {
-          sortedArray = data?.students.sort(function (a, b) {
-            if (b.last_name > a.last_name) {
-              return -1
-            } else return 1
-          })
+          setSortedArray(
+            [...data.students]?.sort(function (a, b) {
+              if (b.last_name > a.last_name) {
+                return 1
+              } else return -1
+            })
+          )
         } else {
-          sortedArray = data?.students.sort(function (a, b) {
-            if (b.last_name > a.last_name) {
-              return 1
-            } else return -1
-          })
+          setSortedArray(
+            [...data?.students]?.sort(function (a, b) {
+              if (b.last_name > a.last_name) {
+                return -1
+              } else return 1
+            })
+          )
         }
-
-        setSortedArray(sortedArray)
       }
     }
   }
