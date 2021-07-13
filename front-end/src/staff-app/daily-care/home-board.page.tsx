@@ -98,9 +98,11 @@ export const HomeBoardPage: React.FC = () => {
 
         {loadState === "loaded" && transformedArray && (
           <>
-            {transformedArray.map((s: any) => (
-              <StudentListTile key={s.id} isRollMode={isRollMode} transformedArray={transformedArray} setTransformedArray={setTransformedArray} student={s} />
-            ))}
+            {transformedArray.map((s: any) => {
+              if (s.visibility !== false) {
+                return <StudentListTile key={s.id} isRollMode={s.status} transformedArray={transformedArray} setTransformedArray={setTransformedArray} student={s} />
+              }
+            })}
           </>
         )}
 
@@ -110,7 +112,7 @@ export const HomeBoardPage: React.FC = () => {
           </CenteredContainer>
         )}
       </S.PageContainer>
-      <ActiveRollOverlay transformedArray={transformedArray} isActive={isRollMode} onItemClick={onActiveRollAction} />
+      <ActiveRollOverlay transformedArray={transformedArray} setTransformedArray={setTransformedArray} data={data} isActive={isRollMode} onItemClick={onActiveRollAction} />
     </>
   )
 }
@@ -141,8 +143,10 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
   const searchUsers = (event: any) => {
     const userInput = event.target.value
     if (userInput !== "") {
-      const filteredUsers = [...data?.students].filter((user) => {
-        return user.first_name.toUpperCase().startsWith(userInput.toUpperCase())
+      const filteredUsers = [...data?.students].map((user) => {
+        if (user.first_name.toUpperCase().startsWith(userInput.toUpperCase())) {
+          return { ...user, visibility: true }
+        } else return { ...user, visibility: false }
       })
       setTransformedArray(filteredUsers)
     } else {
