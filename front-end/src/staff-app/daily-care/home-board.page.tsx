@@ -17,8 +17,6 @@ export const HomeBoardPage: React.FC = () => {
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
   const [transformedArray, setTransformedArray] = useState<any>(data?.students)
 
-  console.log({ transformedArray })
-
   useEffect(() => {
     void getStudents()
   }, [getStudents])
@@ -81,6 +79,11 @@ export const HomeBoardPage: React.FC = () => {
 
   const onActiveRollAction = (action: ActiveRollAction) => {
     if (action === "exit") {
+      setTransformedArray((transformedArray: any) =>
+        transformedArray.map((student: any) => {
+          return { ...student, visibility: true }
+        })
+      )
       setIsRollMode(false)
     }
   }
