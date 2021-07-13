@@ -35,5 +35,5 @@ export const RollStateSwitcher: React.FC<Props> = ({ initialState = "unmark", si
     }
   }
 
-  return <RollStateIcon type={rollState} size={size} onClick={onClick} />
+  return <RollStateIcon type={student.status} size={size} onClick={onClick} />
 }
