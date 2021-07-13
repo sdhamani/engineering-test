@@ -3,15 +3,44 @@ import styled from "styled-components"
 import Button from "@material-ui/core/Button"
 import { BorderRadius, Spacing } from "shared/styles/styles"
 import { RollStateList } from "staff-app/components/roll-state/roll-state-list.component"
+import { saveActiveRoll } from "api/save-active-roll"
+import { useNavigate } from "react-router"
 
 export type ActiveRollAction = "filter" | "exit"
 interface Props {
   isActive: boolean
   onItemClick: (action: ActiveRollAction, value?: string) => void
+  transformedArray: any
+  setTransformedArray: any
+  data: any
 }
 
 export const ActiveRollOverlay: React.FC<Props> = (props) => {
-  const { isActive, onItemClick } = props
+  const navigate = useNavigate()
+  const { isActive, onItemClick, transformedArray, data, setTransformedArray } = props
+
+  const getCount = (type: any) => {
+    let sum: number = 0
+    sum =
+      transformedArray?.length > 0 &&
+      transformedArray?.reduce((currentValue: number, user: any) => {
+        if (user.status === type) {
+          return currentValue + 1
+        }
+        return currentValue
+      }, 0)
+    return sum
+  }
+
+  const submitRoll = () => {
+    const rollInput = transformedArray.map((student: any) => {
+      return { student_id: student.id, roll_state: student.status }
+    })
+    saveActiveRoll({
+      student_roll_states: rollInput,
+    })
+    navigate("/staff/activity")
+  }
 
   return (
     <S.Overlay isActive={isActive}>
@@ -20,17 +49,19 @@ export const ActiveRollOverlay: React.FC<Props> = (props) => {
         <div>
           <RollStateList
             stateList={[
-              { type: "all", count: 0 },
-              { type: "present", count: 0 },
-              { type: "late", count: 0 },
-              { type: "absent", count: 0 },
+              { type: "all", count: transformedArray?.length },
+              { type: "present", count: getCount("present") },
+              { type: "late", count: getCount("late") },
+              { type: "absent", count: getCount("absent") },
             ]}
+            data={data}
+            setTransformedArray={setTransformedArray}
           />
           <div style={{ marginTop: Spacing.u6 }}>
             <Button color="inherit" onClick={() => onItemClick("exit")}>
               Exit
             </Button>
-            <Button color="inherit" style={{ marginLeft: Spacing.u2 }} onClick={() => onItemClick("exit")}>
+            <Button color="inherit" style={{ marginLeft: Spacing.u2 }} onClick={() => submitRoll()}>
               Complete
             </Button>
           </div>

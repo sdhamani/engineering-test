@@ -9,11 +9,27 @@ interface Props {
   stateList: StateList[]
   onItemClick?: (type: ItemType) => void
   size?: number
+  setTransformedArray: any
+  data: any
 }
-export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemClick }) => {
+export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemClick, data, setTransformedArray }) => {
   const onClick = (type: ItemType) => {
     if (onItemClick) {
       onItemClick(type)
+    }
+    if (type !== "all") {
+      setTransformedArray((transformedArray: any) =>
+        transformedArray.map((student: any) => {
+          if (student.status === type) return { ...student, visibility: true }
+          else return { ...student, visibility: false }
+        })
+      )
+    } else {
+      setTransformedArray((transformedArray: any) =>
+        transformedArray.map((student: any) => {
+          return { ...student, visibility: true }
+        })
+      )
     }
   }
 
