@@ -8,10 +8,26 @@ export type ActiveRollAction = "filter" | "exit"
 interface Props {
   isActive: boolean
   onItemClick: (action: ActiveRollAction, value?: string) => void
+  transformedArray: any
+  setTransformedArray: any
+  data: any
 }
 
 export const ActiveRollOverlay: React.FC<Props> = (props) => {
-  const { isActive, onItemClick } = props
+  const { isActive, onItemClick, transformedArray, data, setTransformedArray } = props
+
+  const getCount = (type: any) => {
+    let sum: number = 0
+    sum =
+      transformedArray?.length > 0 &&
+      transformedArray?.reduce((currentValue: number, user: any) => {
+        if (user.status === type) {
+          return currentValue + 1
+        }
+        return currentValue
+      }, 0)
+    return sum
+  }
 
   return (
     <S.Overlay isActive={isActive}>
@@ -20,11 +36,13 @@ export const ActiveRollOverlay: React.FC<Props> = (props) => {
         <div>
           <RollStateList
             stateList={[
-              { type: "all", count: 0 },
-              { type: "present", count: 0 },
-              { type: "late", count: 0 },
-              { type: "absent", count: 0 },
+              { type: "all", count: transformedArray?.length },
+              { type: "present", count: getCount("present") },
+              { type: "late", count: getCount("late") },
+              { type: "absent", count: getCount("absent") },
             ]}
+            data={data}
+            setTransformedArray={setTransformedArray}
           />
           <div style={{ marginTop: Spacing.u6 }}>
             <Button color="inherit" onClick={() => onItemClick("exit")}>
